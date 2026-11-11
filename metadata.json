@@ -1,0 +1,6 @@
+{
+  "name": "Saleem Editor Studio",
+  "description": "AI Timestamp Generator and Comprehensive Video Suite with animated captions, timeline editing, smart speech recognition, and browser video rendering.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

@@ -1,0 +1,734 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Saleem Editor Studio — AI Timestamp & Video Suite</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body class="min-h-screen flex flex-col bg-[#0b0b0c] text-zinc-100">
+
+  <!-- ===================================================================== -->
+  <!-- TOP HEADER / STUDIO SUITE BAR                                         -->
+  <!-- ===================================================================== -->
+  <header class="bg-[#0e0e11] border-b border-[#222226] px-6 py-2.5 flex items-center justify-between sticky top-0 z-50">
+    <div class="flex items-center gap-3">
+      <div class="w-3 h-3 rounded-full bg-emerald-400 animate-pulse"></div>
+      <span class="font-bold tracking-tight text-white text-sm">SALEEM EDITOR STUDIO</span>
+      <span class="text-xs text-zinc-500 font-mono-code bg-[#141418] px-2 py-0.5 rounded border border-zinc-800">v2.4 AI Suite</span>
+    </div>
+
+    <!-- Navigation Switcher -->
+    <div class="flex items-center gap-2 bg-[#16161a] p-1 rounded-xl border border-[#26262c]">
+      <button id="navTab1Btn" onclick="switchStudioTab(1)" class="px-4 py-1.5 rounded-lg text-xs font-semibold bg-white text-black transition">
+        1. Timestamp Generator
+      </button>
+      <button id="navTab2Btn" onclick="switchStudioTab(2)" class="px-4 py-1.5 rounded-lg text-xs font-semibold text-zinc-400 hover:text-white transition">
+        2. Saleem Editor Studio (Video Editor)
+      </button>
+    </div>
+  </header>
+
+  <!-- ===================================================================== -->
+  <!-- PAGE 1: TIMESTAMP GENERATOR (STAMPHUNTER AI)                          -->
+  <!-- ===================================================================== -->
+  <div id="tab1View" class="flex-1 flex flex-col lg:flex-row min-h-[calc(100vh-50px)]">
+    
+    <!-- LEFT SIDEBAR CONTROLS -->
+    <aside class="w-full lg:w-[325px] border-b lg:border-b-0 lg:border-r border-[#222226] bg-[#0d0d0f] flex flex-col justify-between shrink-0">
+      <div class="p-5 space-y-6 overflow-y-auto max-h-[calc(100vh-130px)]">
+        
+        <!-- Voiceover Language -->
+        <div>
+          <label class="block text-xs font-medium text-zinc-300 mb-2">Voiceover language</label>
+          <div class="relative">
+            <select id="voiceLangSelect" onchange="handleLanguageChange(this.value)" class="w-full input-dark px-3.5 py-2.5 text-xs appearance-none cursor-pointer">
+              <option value="auto">🌐 Auto</option>
+              <option value="en" selected>🇺🇸 English</option>
+              <option value="ur">🇵🇰 Urdu (اردو)</option>
+              <option value="hi">🇮🇳 Hindi</option>
+              <option value="es">🇪🇸 Spanish</option>
+              <option value="ar">🇸🇦 Arabic</option>
+              <option value="fr">🇫🇷 French</option>
+              <option value="de">🇩🇪 German</option>
+            </select>
+            <span class="pointer-events-none absolute right-3.5 top-3 text-zinc-500 text-xs">▼</span>
+          </div>
+          <p id="langHelperText" class="text-[11px] text-zinc-500 mt-2 leading-relaxed">
+            StampHunter AI hears the language of the voiceover by itself (99 languages).
+          </p>
+        </div>
+
+        <!-- Accuracy -->
+        <div>
+          <label class="block text-xs font-medium text-zinc-300 mb-2">Accuracy</label>
+          <div class="grid grid-cols-2 bg-[#141417] p-1 rounded-xl border border-[#26262c]">
+            <button type="button" id="accFastBtn" onclick="setAccuracyMode('Fast')" class="py-2 text-xs font-semibold rounded-lg bg-white text-black transition">
+              Fast
+            </button>
+            <button type="button" id="accBestBtn" onclick="setAccuracyMode('Best')" class="py-2 text-xs font-semibold rounded-lg text-zinc-300 hover:text-white transition">
+              Best
+            </button>
+          </div>
+          <p class="text-[11px] text-zinc-500 mt-2 leading-relaxed">
+            The first time, the model downloads once (about 200 MB). After that it opens from this device, with nothing to download. Fastest in Chrome or Edge on a computer.
+          </p>
+        </div>
+
+        <!-- New Timestamp Every -->
+        <div>
+          <label class="block text-[11px] font-semibold uppercase tracking-wider text-zinc-300 mb-2">NEW TIMESTAMP EVERY</label>
+          <div class="grid grid-cols-5 bg-[#141417] p-1 rounded-xl border border-[#26262c] gap-0.5">
+            <button type="button" onclick="setIntervalMode('Sentence')" id="int_Sentence" class="py-2 text-[11px] font-medium rounded-lg text-zinc-300 hover:text-white transition">Sentence</button>
+            <button type="button" onclick="setIntervalMode('3s')" id="int_3s" class="py-2 text-[11px] font-medium rounded-lg text-zinc-300 hover:text-white transition">~3s</button>
+            <button type="button" onclick="setIntervalMode('5s')" id="int_5s" class="py-2 text-[11px] font-medium rounded-lg text-zinc-300 hover:text-white transition">~5s</button>
+            <button type="button" onclick="setIntervalMode('8s')" id="int_8s" class="py-2 text-[11px] font-semibold rounded-lg bg-white text-black transition">~8s</button>
+            <button type="button" onclick="setIntervalMode('Custom')" id="int_Custom" class="py-2 text-[11px] font-medium rounded-lg text-zinc-300 hover:text-white transition">Custom</button>
+          </div>
+          <p id="intervalHelperText" class="text-[11px] text-zinc-500 mt-2 leading-relaxed">
+            Lines always break between words, never in the middle of one.
+          </p>
+
+          <!-- Custom Interval Parts (Visible when Custom is clicked) -->
+          <div id="customIntervalsBox" class="hidden mt-3 space-y-2.5">
+            <div id="customPartsList" class="space-y-2.5"></div>
+            <button type="button" onclick="addCustomIntervalPart()" class="w-full py-2.5 rounded-xl border border-dashed border-zinc-700 text-xs font-medium text-zinc-300 hover:border-zinc-500 hover:text-white transition">
+              + Add a part
+            </button>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Sidebar Bottom Action Button -->
+      <div class="p-4 border-t border-[#222226] bg-[#0d0d0f]">
+        <button id="getTimestampsBtn" onclick="toggleGenerateTimestamps()" class="w-full py-3.5 rounded-xl btn-white text-sm flex items-center justify-center gap-2">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <circle cx="12" cy="13" r="8"></circle>
+            <path d="M12 9v4l2 2M5 3L2 6M22 6l-3-3"></path>
+          </svg>
+          <span id="getTimestampsBtnText">Get Timestamps</span>
+        </button>
+      </div>
+    </aside>
+
+    <!-- MAIN TIMESTAMP WORK AREA -->
+    <main class="flex-1 p-6 lg:p-8 overflow-y-auto space-y-6 max-w-5xl mx-auto w-full">
+      
+      <!-- Top Action Buttons Row -->
+      <div class="flex flex-wrap items-center justify-end gap-2.5">
+        <button onclick="resetTimestampProject()" class="px-4 py-2 rounded-lg btn-outline text-xs font-semibold">
+          New project
+        </button>
+        <!-- Post Generation Action Row -->
+        <div id="topPostActions" class="hidden flex-wrap items-center gap-2.5">
+          <button onclick="downloadSrtFile()" class="px-4 py-2 rounded-lg btn-outline text-xs font-semibold">
+            Download .srt
+          </button>
+          <button onclick="downloadTxtFile()" class="px-4 py-2 rounded-lg btn-outline text-xs font-semibold">
+            Download .txt
+          </button>
+          <button id="copyTimestampsBtn" onclick="copyTimestampsToClipboard()" class="px-4 py-2 rounded-lg btn-outline text-xs font-semibold">
+            Copy
+          </button>
+          <button onclick="sendTimestampsToEditor()" class="px-4 py-2 rounded-lg btn-white text-xs font-semibold shadow-lg">
+            Send to Video Editor
+          </button>
+        </div>
+      </div>
+
+      <!-- VOICEOVER SECTION -->
+      <section class="space-y-3">
+        <div class="flex items-center justify-between">
+          <span class="text-xs font-semibold tracking-wider uppercase text-zinc-300">VOICEOVER</span>
+          <span class="text-xs font-mono-code text-zinc-500">mp3, wav, m4a, mp4..</span>
+        </div>
+
+        <input type="file" id="voiceoverUploadInput" accept="audio/*,video/*" class="hidden" onchange="onVoiceoverFileSelected(event)" />
+
+        <div onclick="document.getElementById('voiceoverUploadInput').click()"
+             ondragover="event.preventDefault()"
+             ondrop="onVoiceoverFileDropped(event)"
+             class="border border-dashed border-zinc-700 hover:border-zinc-500 bg-[#101013] rounded-xl p-10 text-center cursor-pointer transition">
+          <div id="voiceDropEmpty">
+            <p class="text-sm text-zinc-300">
+              <strong class="text-white font-semibold">Drop your voiceover here</strong> or click to choose a file
+            </p>
+            <p class="text-xs text-zinc-500 mt-1">Supports MP3, WAV, M4A, MP4 (reads exact duration & transcribes speech)</p>
+          </div>
+          <div id="voiceDropLoaded" class="hidden space-y-1">
+            <p id="voiceLoadedName" class="text-sm font-semibold text-white"></p>
+            <p class="text-xs text-zinc-400">Click or drop to change</p>
+          </div>
+        </div>
+
+        <!-- Cloud Link Button -->
+        <button onclick="promptCloudLink()" class="w-full py-2.5 rounded-xl btn-outline text-xs font-medium flex items-center justify-center gap-2 text-zinc-300">
+          <svg class="w-4 h-4 text-zinc-400" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+            <path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"></path>
+          </svg>
+          From Google Drive, MEGA, Dropbox, OneDrive or a link
+        </button>
+
+        <!-- Audio Player Bar -->
+        <div id="audioPlayerContainer" class="hidden pt-1">
+          <audio id="voiceoverAudioPlayer" controls class="w-full h-11 rounded-full bg-[#18181d]"></audio>
+        </div>
+      </section>
+
+      <!-- SCRIPT (OPTIONAL) SECTION -->
+      <section class="space-y-2.5">
+        <div class="flex items-center justify-between">
+          <span class="text-xs font-semibold tracking-wider uppercase text-zinc-300">SCRIPT (OPTIONAL)</span>
+          <span class="text-xs font-mono-code text-zinc-500">Gives the exact wording</span>
+        </div>
+        <textarea id="scriptTextInput" rows="6"
+          placeholder="Optional. Paste the script that was read in the voiceover. The timestamps then use your exact words, with no spelling mistakes from the transcription."
+          class="w-full input-dark p-4 text-xs sm:text-sm text-zinc-200 placeholder-zinc-500 leading-relaxed resize-y"></textarea>
+      </section>
+
+      <!-- PROGRESS STATUS BAR -->
+      <section id="readingProgressBarCard" class="hidden panel-card p-5 space-y-3">
+        <div class="flex items-center justify-between text-xs">
+          <span class="font-semibold text-white">Reading the voiceover</span>
+          <span id="readingPartsLabel" class="text-zinc-400 font-mono-code">0 parts</span>
+        </div>
+        <div class="w-full h-2 bg-zinc-800 rounded-full overflow-hidden">
+          <div id="readingProgressFill" class="h-full bg-[#68d328] transition-all duration-200" style="width: 0%"></div>
+        </div>
+        <p id="readingSubStatusLabel" class="text-xs text-zinc-400">
+          Preparing speech recognition...
+        </p>
+      </section>
+
+      <!-- TIMESTAMPED SCRIPT OUTPUT -->
+      <section id="timestampResultsSection" class="hidden space-y-3 pb-8">
+        <div class="flex items-center justify-between">
+          <span class="text-xs font-semibold tracking-wider uppercase text-zinc-300">TIMESTAMPED SCRIPT</span>
+          <span id="timestampSummaryCount" class="text-xs text-zinc-400">
+            <strong class="text-white">0</strong> timestamps · 0:00 long
+          </span>
+        </div>
+
+        <div id="timestampListWrapper" class="panel-card p-5 max-h-[460px] overflow-y-auto space-y-3.5">
+          <!-- Timestamps rows dynamically injected -->
+        </div>
+
+        <!-- Bottom CTA to Video Editor -->
+        <div class="pt-2 flex flex-col sm:flex-row items-center justify-between gap-4 bg-[#141418] border border-zinc-800 p-4 rounded-xl">
+          <div>
+            <p class="text-sm font-semibold text-white">Timestamps Ready for Editing!</p>
+            <p class="text-xs text-zinc-400">Send these timestamps and your voiceover directly into Saleem Editor Studio.</p>
+          </div>
+          <button onclick="sendTimestampsToEditor()" class="w-full sm:w-auto px-6 py-3 rounded-xl btn-white text-sm font-bold flex items-center justify-center gap-2 shadow-lg">
+            <span>Send to Video Editor</span>
+            <span>→</span>
+          </button>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- ===================================================================== -->
+  <!-- PAGE 2: SALEEM EDITOR STUDIO (VIDEO EDITOR)                           -->
+  <!-- ===================================================================== -->
+  <div id="tab2View" class="hidden flex-1 overflow-y-auto pb-24">
+    <div class="max-w-5xl mx-auto px-4 sm:px-6 pt-8 space-y-6">
+      
+      <!-- HEADER -->
+      <div class="flex items-center justify-between pb-2">
+        <button onclick="switchStudioTab(1)" class="px-3.5 py-2 rounded-lg btn-outline text-xs font-medium text-zinc-300">
+          ← Back to Timestamps
+        </button>
+        <h1 class="text-2xl sm:text-3xl font-bold tracking-tight text-white text-center">
+          Saleem Editor Studio
+        </h1>
+        <button onclick="resetEditorProject()" class="px-4 py-2 rounded-lg btn-outline text-xs font-semibold">
+          New project
+        </button>
+      </div>
+
+      <!-- ================================================================= -->
+      <!-- 1 · MEDIA                                                         -->
+      <!-- ================================================================= -->
+      <section class="panel-card p-6 space-y-5">
+        <h2 class="text-xs font-semibold uppercase tracking-widest text-zinc-400">1 · MEDIA</h2>
+
+        <!-- Hidden file inputs -->
+        <input type="file" id="mediaFilesPicker" multiple accept="image/*,video/*" class="hidden" onchange="onMediaFilesChosen(event)" />
+        <input type="file" id="mediaFolderPicker" webkitdirectory directory multiple class="hidden" onchange="onMediaFilesChosen(event)" />
+        <input type="file" id="editorVoicePicker" accept="audio/*" class="hidden" onchange="onEditorVoiceChosen(event)" />
+        <input type="file" id="bgMusicPicker" accept="audio/*" class="hidden" onchange="onBgMusicChosen(event)" />
+
+        <!-- Media Dropzone & Buttons -->
+        <div ondragover="event.preventDefault()" ondrop="onMediaFilesDropped(event)"
+             class="border border-dashed border-zinc-700 rounded-xl p-5 flex flex-wrap items-center gap-3 bg-[#0e0e11]">
+          <button onclick="document.getElementById('mediaFolderPicker').click()" class="px-4 py-2.5 rounded-lg btn-outline text-xs font-semibold">
+            Add Folder
+          </button>
+          <button onclick="document.getElementById('mediaFilesPicker').click()" class="px-4 py-2.5 rounded-lg btn-outline text-xs font-semibold">
+            Add Images / Videos
+          </button>
+          <button onclick="loadSampleMediaClips()" class="px-4 py-2.5 rounded-lg btn-outline text-xs font-semibold">
+            From cloud
+          </button>
+          <span class="text-xs text-zinc-400 px-1">or drag files here</span>
+          <button onclick="clearTimelineMedia()" class="px-4 py-2.5 rounded-lg btn-outline text-xs font-semibold ml-auto">
+            Clear Media
+          </button>
+        </div>
+
+        <!-- Voiceover Row -->
+        <div class="flex flex-wrap items-center gap-3">
+          <button onclick="document.getElementById('editorVoicePicker').click()" class="px-4 py-2.5 rounded-lg btn-outline text-xs font-semibold">
+            Add Voiceover (optional)
+          </button>
+          <button onclick="promptCloudLink()" class="px-4 py-2.5 rounded-lg btn-outline text-xs font-semibold">
+            From cloud
+          </button>
+          <span id="editorVoiceLabel" class="text-xs text-zinc-300 font-mono-code">
+            No voiceover loaded
+          </span>
+          <button onclick="removeEditorVoiceover()" class="px-3.5 py-2 rounded-lg btn-outline text-xs font-semibold">
+            Remove
+          </button>
+          <!-- Audio waveform canvas visualizer -->
+          <div class="w-full sm:w-64 h-7 bg-[#141419] rounded-lg border border-zinc-800 p-1 flex items-center">
+            <canvas id="voiceWaveformCanvas" width="240" height="20" class="w-full h-full"></canvas>
+          </div>
+        </div>
+
+        <!-- Background Music Row -->
+        <div class="flex flex-wrap items-center gap-3">
+          <button onclick="document.getElementById('bgMusicPicker').click()" class="px-4 py-2.5 rounded-lg btn-outline text-xs font-semibold">
+            Add background music (optional)
+          </button>
+          <span id="bgMusicLabel" class="text-xs text-zinc-500">No music added</span>
+        </div>
+
+        <!-- Soft Clip Sound Checkbox -->
+        <label class="flex items-center gap-2.5 text-xs text-zinc-300 cursor-pointer select-none pt-1">
+          <input type="checkbox" id="keepClipSoundCheckbox" class="w-4 h-4 rounded bg-zinc-900 border-zinc-700 accent-white" />
+          <span>Keep the video clips' own sound, very softly in the background (like background music). Off: the clips are silent.</span>
+        </label>
+      </section>
+
+      <!-- ================================================================= -->
+      <!-- 2 · SETTINGS                                                      -->
+      <!-- ================================================================= -->
+      <section class="panel-card p-6 space-y-5">
+        <h2 class="text-xs font-semibold uppercase tracking-widest text-zinc-400">2 · SETTINGS</h2>
+
+        <!-- 8 Dropdowns Grid -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div>
+            <label class="block text-xs text-zinc-400 mb-1.5">Video size</label>
+            <select id="settingVideoSize" class="w-full input-dark px-3 py-2.5 text-xs font-medium">
+              <option value="1080p">1080p</option>
+              <option value="4k">4K · 2160p</option>
+              <option value="720p">720p</option>
+              <option value="shorts">1080x1920 · Shorts</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs text-zinc-400 mb-1.5">Quality</label>
+            <select id="settingQuality" class="w-full input-dark px-3 py-2.5 text-xs font-medium">
+              <option value="best">YouTube best · ~780 MB</option>
+              <option value="high">High · ~490 MB</option>
+              <option value="medium">Standard · ~280 MB</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs text-zinc-400 mb-1.5">FPS</label>
+            <select id="settingFps" class="w-full input-dark px-3 py-2.5 text-xs font-medium">
+              <option value="30">30</option>
+              <option value="60">60</option>
+              <option value="24">24</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs text-zinc-400 mb-1.5">Fit mode</label>
+            <select id="settingFitMode" class="w-full input-dark px-3 py-2.5 text-xs font-medium">
+              <option value="fit">Fit · full frame, black bars</option>
+              <option value="fill">Fill · crop to fill screen</option>
+              <option value="stretch">Stretch to frame</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="block text-xs text-zinc-400 mb-1.5">Image motion</label>
+            <select id="settingImageMotion" class="w-full input-dark px-3 py-2.5 text-xs font-medium">
+              <option value="auto">Auto · the motions you choose</option>
+              <option value="zoom_in">Always Zoom in</option>
+              <option value="zoom_out">Always Zoom out</option>
+              <option value="none">Off · static pictures</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs text-zinc-400 mb-1.5">Motion speed</label>
+            <select id="settingMotionSpeed" class="w-full input-dark px-3 py-2.5 text-xs font-medium">
+              <option value="slow">Slow · calm and smooth</option>
+              <option value="normal">Medium · standard</option>
+              <option value="fast">Fast · energetic</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs text-zinc-400 mb-1.5">Transitions</label>
+            <select id="settingTransitions" class="w-full input-dark px-3 py-2.5 text-xs font-medium">
+              <option value="auto">Auto · picked for each cut</option>
+              <option value="dissolve">Cross dissolve only</option>
+              <option value="none">None · hard cuts</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs text-zinc-400 mb-1.5">Transition sounds</label>
+            <select id="settingTransSounds" class="w-full input-dark px-3 py-2.5 text-xs font-medium">
+              <option value="auto">Auto · a soft sound for each</option>
+              <option value="whoosh">Soft whoosh</option>
+              <option value="off">Off · silent cuts</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Volume & Gaps Row -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 items-center pt-1">
+          <div>
+            <div class="flex justify-between text-xs text-zinc-400 mb-1">
+              <span>Sound volume</span>
+            </div>
+            <div class="text-xs font-semibold text-zinc-200 mb-1.5"><span id="soundVolumeLabel">25</span>%</div>
+            <input type="range" id="soundVolumeSlider" min="0" max="100" value="25"
+                   oninput="document.getElementById('soundVolumeLabel').innerText = this.value"
+                   class="w-full accent-sky-400 cursor-pointer" />
+          </div>
+          <div>
+            <label class="block text-xs text-zinc-400 mb-1.5">Gaps between clips</label>
+            <select id="settingGapsMode" class="w-full input-dark px-3 py-2.5 text-xs font-medium">
+              <option value="extend">Extend previous clip</option>
+              <option value="black">Leave black gap</option>
+              <option value="stretchBoth">Split between neighbor clips</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Accordion: Choose the effects -->
+        <div class="border border-[#26262c] rounded-xl bg-[#0e0e11] overflow-hidden">
+          <button type="button" onclick="toggleEffectsAccordion()" class="w-full px-4 py-3.5 text-left text-xs font-semibold flex items-center gap-2 hover:bg-[#16161b] transition">
+            <span id="effectsAccordionArrow">▼</span>
+            <span class="text-white">Choose the effects</span>
+            <span id="effectsSummaryMeta" class="text-zinc-400 font-normal">· 4 of 4 motions · 11 of 16 transitions</span>
+          </button>
+
+          <div id="effectsAccordionDrawer" class="px-4 pb-4 pt-2 space-y-4 border-t border-[#222226]">
+            <div>
+              <p class="text-xs text-zinc-400 mb-2.5">Motions (mixed for the pictures)</p>
+              <div id="motionPillsList" class="flex flex-wrap gap-2"></div>
+            </div>
+            <div>
+              <p class="text-xs text-zinc-400 mb-2.5">Transitions (Auto picks from these, to suit each pair of pictures)</p>
+              <div id="transitionPillsList" class="flex flex-wrap gap-2"></div>
+            </div>
+            <p class="text-[11px] text-zinc-500">
+              Filled with ✓ = used. Press any effect to turn it on or off. One clip different? Press its motion or transition in the list below and pick another.
+            </p>
+          </div>
+        </div>
+
+        <!-- Subscribe Button Configuration Panel -->
+        <div class="border border-[#26262c] rounded-xl p-4 bg-[#0e0e11] space-y-4">
+          <div class="max-w-md">
+            <label class="block text-xs text-zinc-400 mb-1.5">Subscribe button</label>
+            <select id="subscribeToggle" onchange="toggleSubscribeOptions()" class="w-full input-dark px-3 py-2.5 text-xs font-medium">
+              <option value="on">On · an animated Subscribe button with a bell</option>
+              <option value="off">Off</option>
+            </select>
+          </div>
+
+          <div id="subscribeDetailsBox" class="space-y-4">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-3">
+              <div class="md:col-span-2">
+                <label class="block text-xs text-zinc-400 mb-1.5">When it shows (minutes:seconds, as many times as you like)</label>
+                <input type="text" id="subscribeTimesInput" value="0:05, 5:00, 10:00" oninput="updateSubscribeTextSummary()" class="w-full input-dark px-3 py-2 text-xs" />
+              </div>
+              <div>
+                <label class="block text-xs text-zinc-400 mb-1.5">Where</label>
+                <select id="subscribePosSelect" onchange="updateSubscribeBadgePosition()" class="w-full input-dark px-3 py-2 text-xs">
+                  <option value="top-right">Top right</option>
+                  <option value="top-left">Top left</option>
+                  <option value="bottom-right">Bottom right</option>
+                  <option value="bottom-left">Bottom left</option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-xs text-zinc-400 mb-1.5">Size</label>
+                <select id="subscribeSizeSelect" onchange="updateSubscribeBadgePosition()" class="w-full input-dark px-3 py-2 text-xs">
+                  <option value="normal">Normal</option>
+                  <option value="small">Small</option>
+                  <option value="large">Large</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Quick Fill Buttons -->
+            <div class="flex flex-wrap items-center gap-2 text-xs">
+              <span class="text-zinc-400 mr-1">Fill in:</span>
+              <button type="button" onclick="quickFillSubscribeTimes('0:05, 12:20')" class="px-3 py-1.5 rounded-lg btn-outline font-medium">Start and end</button>
+              <button type="button" onclick="quickFillSubscribeTimes('0:05, 5:00, 10:00')" class="px-3 py-1.5 rounded-lg btn-outline font-medium">Every 5 minutes</button>
+              <button type="button" onclick="quickFillSubscribeTimes('0:05, 10:00')" class="px-3 py-1.5 rounded-lg btn-outline font-medium">Every 10 minutes</button>
+              <button type="button" onclick="quickFillSubscribeTimes('')" class="px-3 py-1.5 rounded-lg btn-outline font-medium">Clear</button>
+            </div>
+
+            <!-- Live Subscribe Preview Frame -->
+            <div class="flex flex-col md:flex-row gap-4 items-start pt-1">
+              <div class="relative w-full md:w-[380px] aspect-video rounded-lg overflow-hidden border border-zinc-800 bg-zinc-900 shrink-0 select-none shadow-md">
+                <img id="subPreviewBackgroundImg" src="https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=800&q=80" alt="Mountain preview" class="w-full h-full object-cover" />
+                
+                <!-- Animated Subscribe Overlay Badge -->
+                <div id="subOverlayBadge" class="sub-badge-anim absolute top-3 right-3 bg-red-600 text-white px-3 py-1 rounded-full flex items-center gap-1.5 shadow-xl text-[11px] font-bold tracking-wider">
+                  <span>SUBSCRIBE</span>
+                  <span class="sub-bell-icon bg-white/20 rounded-full p-0.5 text-[10px]">🔔</span>
+                </div>
+              </div>
+              <p id="subscribeSummaryText" class="text-xs text-zinc-400 pt-1 leading-relaxed">
+                It shows 3 times, about 4.6 seconds each: 0:05, 5:00, 10:00.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Save Settings Row -->
+        <div class="flex flex-wrap items-center gap-3 pt-1">
+          <button type="button" onclick="saveUserSettingsToServer()" class="px-4 py-2.5 rounded-lg btn-outline text-xs font-semibold">
+            Save as my settings
+          </button>
+          <span id="saveSettingsNoticeText" class="text-xs text-zinc-500">
+            Saved settings are used every time you open Saleem Editor Studio.
+          </span>
+        </div>
+      </section>
+
+      <!-- ================================================================= -->
+      <!-- 3 · CAPTIONS (synced to the voice)                                -->
+      <!-- ================================================================= -->
+      <section class="panel-card p-6 space-y-5">
+        <h2 class="text-xs font-semibold uppercase tracking-widest text-zinc-400">3 · CAPTIONS (synced to the voice)</h2>
+
+        <!-- 16 Caption Style Pills -->
+        <div id="captionStylesList" class="flex flex-wrap gap-2"></div>
+
+        <!-- Colour Swatches -->
+        <div class="flex items-center gap-3 pt-1">
+          <span class="text-xs text-zinc-400">Colour</span>
+          <div id="captionColorsList" class="flex items-center gap-2"></div>
+        </div>
+
+        <!-- Draggable Caption Preview & Size Controls -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start pt-1">
+          
+          <!-- Left 16:9 Draggable Preview Frame -->
+          <div id="captionPreviewBox" class="lg:col-span-7 relative w-full aspect-video rounded-xl overflow-hidden border border-zinc-800 bg-zinc-950 select-none">
+            <img id="captionPreviewBgImg" src="https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=900&q=80" alt="Caption preview" class="w-full h-full object-cover pointer-events-none" />
+            
+            <!-- Draggable Subtitle Caption Element -->
+            <div id="draggableCaption"
+                 onmousedown="startDraggingCaption(event)"
+                 ontouchstart="startDraggingCaptionTouch(event)"
+                 style="left: 50%; top: 82%; transform: translate(-50%, -50%);"
+                 class="cap-style-typewriter text-xl whitespace-nowrap">
+              Your Subtitles Appear Here
+            </div>
+          </div>
+
+          <!-- Right Position & Size Controls -->
+          <div class="lg:col-span-5 space-y-4">
+            <p class="text-xs text-zinc-400 leading-relaxed">
+              Drag the caption on the preview to set where subtitles appear. Position: <strong id="captionPositionLabel" class="text-white">Lower third</strong>
+            </p>
+            <button type="button" onclick="resetCaptionCoordinates()" class="w-full py-2.5 rounded-lg btn-outline text-xs font-semibold">
+              Reset position
+            </button>
+
+            <div class="space-y-2 pt-2">
+              <div class="text-xs text-zinc-300">Size: <span id="captionSizeLabel" class="font-semibold text-white">100%</span></div>
+              <div class="flex items-center gap-3">
+                <button type="button" onclick="adjustCaptionSizeBy(-10)" class="px-3 py-1.5 rounded-lg btn-outline text-xs font-bold">A-</button>
+                <input type="range" id="captionSizeRange" min="60" max="160" value="100" oninput="setCaptionSizeValue(this.value)" class="flex-1 accent-sky-400 cursor-pointer" />
+                <button type="button" onclick="adjustCaptionSizeBy(10)" class="px-3 py-1.5 rounded-lg btn-outline text-xs font-bold">A+</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Caption Language -->
+        <div class="max-w-xs pt-2">
+          <label class="block text-xs text-zinc-400 mb-1.5">Caption language · detected from your captions</label>
+          <select id="captionLangSelect" class="w-full input-dark px-3 py-2.5 text-xs font-medium">
+            <option>English</option>
+            <option>Urdu</option>
+            <option>Hindi</option>
+            <option>Spanish</option>
+            <option>Arabic</option>
+          </select>
+        </div>
+
+        <!-- Captions Script Box -->
+        <div class="space-y-2.5">
+          <label class="block text-xs text-zinc-400">Captions</label>
+          <textarea id="editorCaptionsText" rows="5" oninput="recalcWordCountStatus()" class="w-full input-dark p-4 text-xs sm:text-sm text-zinc-200 leading-relaxed font-sans"></textarea>
+          
+          <input type="file" id="loadCaptionsFileInput" accept=".srt,.txt" class="hidden" onchange="onLoadCaptionFile(event)" />
+          <div class="flex flex-wrap gap-2.5 pt-1">
+            <button type="button" onclick="document.getElementById('loadCaptionsFileInput').click()" class="px-4 py-2.5 rounded-lg btn-outline text-xs font-semibold">
+              Load .txt / .docx
+            </button>
+            <button type="button" onclick="document.getElementById('loadCaptionsFileInput').click()" class="px-4 py-2.5 rounded-lg btn-outline text-xs font-semibold">
+              Upload SRT
+            </button>
+          </div>
+          <p id="captionWordCountNotice" class="text-xs text-emerald-400 pt-1">
+            0 words timed.
+          </p>
+        </div>
+      </section>
+
+      <!-- ================================================================= -->
+      <!-- 4 · TIMELINE                                                      -->
+      <!-- ================================================================= -->
+      <section class="panel-card p-6 space-y-5">
+        <div class="flex flex-wrap items-center justify-between gap-2">
+          <h2 class="text-xs font-semibold uppercase tracking-widest text-zinc-400">4 · TIMELINE</h2>
+          <div class="flex flex-wrap items-center gap-2 text-xs">
+            <span id="tlImagesBadge" class="px-3 py-1 rounded-full bg-[#18181c] border border-zinc-800 text-zinc-200 font-medium">0 clips</span>
+            <span id="tlLengthBadge" class="px-3 py-1 rounded-full bg-[#18181c] border border-zinc-800 text-zinc-200 font-medium">Length 0:00.00</span>
+            <span class="px-3 py-1 rounded-full bg-[#18181c] border border-zinc-800 text-zinc-300 font-medium">Synced with audio</span>
+          </div>
+        </div>
+
+        <!-- Visual Segmented Timeline Bar -->
+        <div class="space-y-2">
+          <div id="visualTimelineBar" class="w-full h-11 rounded-lg bg-[#141b2a] overflow-hidden flex items-stretch p-0.5 gap-[2px] border border-zinc-800">
+            <!-- Timeline segments injected by JS -->
+          </div>
+          <div class="flex justify-between text-[11px] font-mono-code text-zinc-400">
+            <span>0:00.00</span>
+            <span id="timelineMidTime">0:30.00</span>
+            <span id="timelineMaxTime">0:00.00</span>
+          </div>
+          <div class="flex items-center gap-4 text-xs text-zinc-400 pt-1">
+            <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-sm bg-blue-500 inline-block"></span> Image</span>
+            <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-sm bg-orange-500 inline-block"></span> Video</span>
+            <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-sm bg-zinc-800 border border-zinc-600 inline-block"></span> Gap</span>
+          </div>
+        </div>
+
+        <!-- Clips Table -->
+        <div class="border border-[#232329] rounded-xl overflow-hidden bg-[#0d0d10]">
+          <div class="max-h-[340px] overflow-y-auto">
+            <table class="w-full text-left border-collapse text-xs">
+              <thead class="bg-[#141418] text-zinc-400 border-b border-[#232329] sticky top-0 z-10">
+                <tr>
+                  <th class="py-3 px-4 font-medium">#</th>
+                  <th class="py-3 px-4 font-medium">File</th>
+                  <th class="py-3 px-4 font-medium">Type</th>
+                  <th class="py-3 px-4 font-medium">Start</th>
+                  <th class="py-3 px-4 font-medium">End</th>
+                  <th class="py-3 px-4 font-medium">Duration</th>
+                  <th class="py-3 px-4 font-medium">Motion & Transition</th>
+                  <th class="py-3 px-4 font-medium text-right"></th>
+                </tr>
+              </thead>
+              <tbody id="timelineTableBody" class="divide-y divide-[#1e1e24] font-mono-code">
+                <!-- Rows injected dynamically -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================================================================= -->
+      <!-- 5 · EXPORT                                                        -->
+      <!-- ================================================================= -->
+      <section class="panel-card p-6 space-y-5">
+        <h2 class="text-xs font-semibold uppercase tracking-widest text-zinc-400">5 · EXPORT</h2>
+
+        <div class="max-w-md">
+          <label class="block text-xs text-zinc-400 mb-1.5">Voiceover length</label>
+          <select id="exportVoiceLengthOption" class="w-full input-dark px-3.5 py-2.5 text-xs font-medium">
+            <option>Match video length · cut extra voiceover</option>
+            <option>Keep full voiceover · extend final clip</option>
+            <option>Fit clips to exact voiceover duration</option>
+          </select>
+        </div>
+
+        <div class="flex flex-wrap items-center gap-2">
+          <label class="text-xs font-semibold text-white mr-2">File name</label>
+          <input type="text" id="exportFileNameInput" value="final_video" class="w-64 sm:w-80 input-dark px-3.5 py-2.5 text-xs font-mono-code" />
+          <span class="text-xs text-zinc-400 font-mono-code">.mp4</span>
+        </div>
+
+        <div class="flex flex-wrap items-center gap-3">
+          <button type="button" onclick="chooseSaveFolder()" class="px-4 py-2.5 rounded-lg btn-outline text-xs font-semibold">
+            Choose save folder
+          </button>
+          <span id="saveFolderLabel" class="text-xs text-zinc-400">
+            Not chosen · the video is kept in the browser (drive C) until you press Save MP4
+          </span>
+        </div>
+
+        <p class="text-xs text-zinc-400">This video needs about 897 MB.</p>
+
+        <div>
+          <button id="startCreateVideoBtn" onclick="triggerVideoRendering()" class="px-7 py-3.5 rounded-xl btn-white text-sm font-bold shadow-lg">
+            Create Video
+          </button>
+        </div>
+
+        <!-- Render Progress Bar -->
+        <div class="w-full h-2.5 bg-[#18181c] rounded-full overflow-hidden border border-zinc-800">
+          <div id="videoRenderProgressFill" class="h-full bg-emerald-400 transition-all duration-200" style="width: 0%"></div>
+        </div>
+
+        <p id="exportStatusLabel" class="text-xs text-emerald-400 font-medium">
+          Ready to render. Press Create Video.
+        </p>
+
+        <!-- Final Rendered Player / Live Canvas View -->
+        <div id="renderResultBox" class="hidden pt-5 border-t border-zinc-800 space-y-4">
+          <div class="flex flex-wrap items-center justify-between gap-3">
+            <h3 class="text-sm font-bold text-white flex items-center gap-2">
+              <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
+              Video Rendered Output (Saleem Editor Studio Preview)
+            </h3>
+            <button onclick="downloadRenderedVideoFile()" class="px-5 py-2.5 rounded-lg btn-white text-xs font-bold shadow-md">
+              ⬇ Save MP4 to Device
+            </button>
+          </div>
+          
+          <div class="relative w-full max-w-2xl aspect-video rounded-xl overflow-hidden border border-zinc-700 bg-black shadow-2xl">
+            <canvas id="exportLiveCanvas" width="1280" height="720" class="w-full h-full object-contain"></canvas>
+          </div>
+        </div>
+      </section>
+
+    </div>
+  </div>
+
+  <!-- Toast Notification element -->
+  <div id="toastNotification">
+    <span id="toastIcon">✓</span>
+    <span id="toastMessage">Notification message</span>
+  </div>
+
+  <!-- Scripts -->
+  <script src="/js/timestamps.js"></script>
+  <script src="/js/editor.js"></script>
+  <script src="/js/videoRenderer.js"></script>
+  <script src="/js/app.js"></script>
+</body>
+</html>
+
